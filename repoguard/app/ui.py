@@ -59,7 +59,7 @@ def set_start_with_windows(on):
     if os.name != "nt" or not startup_command():
         return
     import winreg
-    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY, 0, winreg.KEY_SET_VALUE) as k:
+    with winreg.CreateKeyEx(winreg.HKEY_CURRENT_USER, RUN_KEY, 0, winreg.KEY_SET_VALUE) as k:  # missing on a fresh PC
         if on:
             winreg.SetValueEx(k, APP_NAME, 0, winreg.REG_SZ, startup_command())
         else:

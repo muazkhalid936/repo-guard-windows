@@ -73,7 +73,7 @@ def test_real_run_key_and_scheduled_task(tmp_path):
     script = tmp_path / "evil" / "init.js"
     write(script, "x" + PAD + LOADER + "\n")
     # tmp_path is under %TEMP%, a risky place, and the script holds the malware's marker
-    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, key, 0, winreg.KEY_SET_VALUE) as k:
+    with winreg.CreateKeyEx(winreg.HKEY_CURRENT_USER, key, 0, winreg.KEY_SET_VALUE) as k:  # a fresh PC may not have it yet
         winreg.SetValueEx(k, name, 0, winreg.REG_SZ, f"powershell -w hidden -enc {ENC}")
     subprocess.run(["schtasks", "/Create", "/TN", name, "/TR", f'node "{script}"', "/SC", "ONLOGON", "/F"], check=True,
                    capture_output=True)
