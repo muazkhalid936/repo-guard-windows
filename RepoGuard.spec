@@ -5,8 +5,7 @@ import os
 HIDDEN = ["argparse", "base64", "datetime", "difflib", "hashlib", "importlib.util", "json", "re", "shutil", "stat",
           "subprocess", "tempfile", "time", "urllib.request", "urllib.parse", "urllib.error", "http.client", "ssl",
           "socket", "signal", "getpass", "runpy", "winreg", "ctypes", "html", "plistlib"]
-DATAS = [("repoguard/core/*.py", "repoguard/core"), ("repoguard/core/rules.json", "repoguard/core"),
-         ("repoguard/githooks/*", "repoguard/githooks")]
+DATAS = [("repoguard/core/rules.json", "repoguard/core"), ("repoguard/githooks/*", "repoguard/githooks")]
 ICON = "build/RepoGuard.ico" if os.path.exists("build/RepoGuard.ico") else None
 
 app_a = Analysis(["run_app.py"], datas=DATAS, hiddenimports=HIDDEN, excludes=["tkinter"])
@@ -16,3 +15,13 @@ cli_pyz = PYZ(cli_a.pure)
 app_exe = EXE(app_pyz, app_a.scripts, [], exclude_binaries=True, name="RepoGuard", console=False, icon=ICON)
 cli_exe = EXE(cli_pyz, cli_a.scripts, [], exclude_binaries=True, name="repoguard-cli", console=True, icon=ICON)
 coll = COLLECT(app_exe, app_a.binaries, app_a.datas, cli_exe, cli_a.binaries, cli_a.datas, name="RepoGuard")
+
+# PyInstaller drops .py files listed as data, but the core scripts must ship as source: repoguard-cli runs
+# them by path (each in its own process) and they load each other by file name. Copy them in after collecting.
+import glob, shutil
+_core = os.path.join(DISTPATH, "RepoGuard", "_internal", "repoguard", "core")
+os.makedirs(_core, exist_ok=True)
+for _f in glob.glob(os.path.join("repoguard", "core", "*.py")) + [os.path.join("repoguard", "core", "rules.json")]:
+    shutil.copy2(_f, _core)
+_missing = [n for n in ("engine", "cleaner", "github_watch", "pc_agent", "gitscan") if not os.path.exists(os.path.join(_core, n + ".py"))]
+assert not _missing, f"core scripts missing from the build: {_missing}"
