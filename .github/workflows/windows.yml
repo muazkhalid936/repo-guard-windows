@@ -42,7 +42,9 @@ jobs:
 
       - name: Screenshots of every page
         shell: pwsh
+        continue-on-error: true
         run: |
+          $env:QT_QPA_PLATFORM = $null  # the real Windows display, with Windows' own fonts
           $env:REPOGUARD_SUPPORT = "$env:RUNNER_TEMP\rg-snap"
           Start-Process -Wait -FilePath "dist\RepoGuard\RepoGuard.exe" -ArgumentList "--snapshot", "$PWD\snapshots"
           Get-ChildItem snapshots
