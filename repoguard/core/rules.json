@@ -1,0 +1,158 @@
+{
+ "version": 1,
+ "max_file_bytes": 5000000,
+ "skip_dirs": [
+  "node_modules",
+  ".next",
+  ".nuxt",
+  "dist",
+  "build",
+  "out",
+  ".turbo",
+  ".cache",
+  "venv",
+  ".venv",
+  "__pycache__",
+  "Pods",
+  ".gradle",
+  "DerivedData",
+  "coverage",
+  "bower_components"
+ ],
+ "skip_content": "(?:^|/)(?:package-lock\\.json|yarn\\.lock|pnpm-lock\\.yaml|bun\\.lockb?|composer\\.lock)$",
+ "vendored": "(?:^|/)(?:node_modules|vendor|site-packages|dist-packages|\\.?venv[^/]*)/|\\.min\\.[jc]ss?$|\\.map$",
+ "code_files": "\\.(?:c|m)?[jt]sx?$|\\.json$|\\.vue$|\\.py$|\\.sh$|(?:^|/)init$",
+ "media_files": "\\.(?:png|jpe?g|gif|webp|ico|woff2?|ttf|otf|eot|mp3|mp4|pdf)$",
+ "path_rules": [
+  {
+   "id": "orc_file",
+   "severity": "block",
+   "label": "Fake font payload file (.orc)",
+   "pattern": "\\.orc$"
+  },
+  {
+   "id": "config_bat",
+   "severity": "block",
+   "label": "Malware dropper file",
+   "pattern": "(?:^|/)(?:config\\.bat|temp_auto_push\\.bat|temp_interactive_push\\.bat)$"
+  },
+  {
+   "id": "init_file",
+   "severity": "review",
+   "label": "File named init (used by this malware)",
+   "pattern": "(?:^|/)init$"
+  },
+  {
+   "id": "autorun_location",
+   "severity": "review",
+   "label": "File that can run code automatically",
+   "pattern": "(?:^|/)\\.vscode/tasks\\.json$|(?:^|/)\\.husky/|(?:^|/)\\.npmrc$|(?:^|/)\\.gitmodules$|^\\.github/workflows/"
+  }
+ ],
+ "content_rules": [
+  {
+   "id": "known_code",
+   "severity": "block",
+   "scope": "any",
+   "label": "Known malware code",
+   "pattern": "cNyiIhxmKlTvaNSt|rCLdggd\\$ZUlOU|FHptxEVPmEWNHCYlL|hLsNetSECrqLyGkrjdgtIJ|iHnmzEbnHW|Fy_hvvQdtanMSNmFvVBQC|mlCqUCKEc|global\\.i\\s*=\\s*'A11|var z = '-6752|rmcej%otb%|Cot%3t=shtP"
+  },
+  {
+   "id": "known_host",
+   "severity": "block",
+   "scope": "any",
+   "label": "Known malware server address",
+   "pattern": "jsonkeeper\\.com|npoint\\.io|ipcheck-six"
+  },
+  {
+   "id": "autorun",
+   "severity": "block",
+   "scope": "vscode",
+   "label": "Runs automatically when the folder opens",
+   "pattern": "runOn\"?\\s*:\\s*\"folderOpen\"|allowAutomaticTasks\"?\\s*:\\s*(?:\"on\"|true)"
+  },
+  {
+   "id": "loader_lines",
+   "severity": "block",
+   "scope": "any",
+   "label": "Malware loader lines",
+   "pattern": "createRequire\\(import\\.meta\\.url\\)\\s*;?\\s*\\r?\\n\\s*var module\\s*="
+  },
+  {
+   "id": "encoded_exec",
+   "severity": "block",
+   "scope": "any",
+   "label": "Runs encoded code",
+   "pattern": "(?:eval|Function)\\s*\\(\\s*(?:atob|Buffer\\.from)\\s*\\("
+  },
+  {
+   "id": "gitignore_marker",
+   "severity": "block",
+   "scope": "gitignore",
+   "label": "Malware marker in .gitignore",
+   "pattern": "^(?:config\\.bat|temp_auto_push\\.bat|temp_interactive_push\\.bat|branch_structure\\.json)\\s*$"
+  },
+  {
+   "id": "npm_loader",
+   "severity": "block",
+   "scope": "package_json",
+   "label": "npm script runs a hidden loader",
+   "pattern": "\"[\\w:.-]+\"\\s*:\\s*\"node\\s+(?:\\./)?init\\b"
+  },
+  {
+   "id": "install_script",
+   "severity": "review",
+   "scope": "package_json",
+   "label": "Package install script",
+   "pattern": "\"(?:preinstall|install|postinstall|prepare)\"\\s*:\\s*\""
+  },
+  {
+   "id": "offscreen",
+   "severity": "block",
+   "scope": "code",
+   "label": "Code hidden far off-screen",
+   "pattern": "\\S[ \\t]{100,}[^\\s/*#<-]"
+  },
+  {
+   "id": "obfuscated_loop",
+   "severity": "block",
+   "scope": "code",
+   "label": "Obfuscated code",
+   "pattern": "while\\s*\\(\\s*!!\\[\\]\\s*\\)"
+  },
+  {
+   "id": "obfuscated_ids",
+   "severity": "block",
+   "scope": "code",
+   "label": "Obfuscated code",
+   "pattern": "_0x[0-9a-f]{4,}",
+   "min_count": 20
+  },
+  {
+   "id": "eth_loader",
+   "severity": "block",
+   "scope": "any",
+   "label": "Loads code from an Ethereum transaction",
+   "pattern": "ethplorer\\.io|eth_getTransactionByHash|0x3b1574417524c11a7403c4b232CAcBb320CceBC6"
+  }
+ ],
+ "fake_media": {
+  "severity": "block",
+  "label": "Code disguised as a media or font file",
+  "pattern": "function\\s*\\(|require\\(|\\bvar\\s"
+ },
+ "git_config_rules": [
+  {
+   "id": "git_config_exec",
+   "severity": "block",
+   "label": "Git setting that can run a program",
+   "pattern": "^\\s*(?:fsmonitor\\s*=\\s*(?!false)|sshcommand\\s*=|pager\\s*=|editor\\s*=|askpass\\s*=|gitproxy\\s*=|textconv\\s*=|external\\s*=|clean\\s*=|smudge\\s*=|process\\s*=|[\\w.-]+\\s*=\\s*!)"
+  },
+  {
+   "id": "git_config_hooks",
+   "severity": "block",
+   "label": "Repo redirects Git hooks",
+   "pattern": "^\\s*hookspath\\s*=\\s*(?!\\.husky)"
+  }
+ ]
+}

@@ -1,0 +1,40 @@
+#!/bin/sh
+# RepoGuard: blocks fetch, pull and clone when the incoming code has malware.
+# Git calls this before it saves new remote branch positions. Exiting non-zero cancels the
+# update, so a pull stops before any of your files change. Works for the terminal, VS Code and
+# GitHub Desktop alike. Only reads git objects; nothing from the repo is run.
+# Override once (e.g. to clone an infected repo for cleaning): REPOGUARD_ALLOW_FETCH=1 git ...
+[ "$1" = prepared ] || exit 0
+[ -n "$REPOGUARD_ALLOW_FETCH" ] && exit 0
+. "$(dirname "$0")/repoguard.conf"
+
+tips=""
+while read -r old new ref; do
+  case "$ref" in refs/remotes/*) ;; *) continue ;; esac
+  case "$new" in ref:*|"") continue ;; esac   # symbolic ref (origin/HEAD)
+  case "$new" in *[!0]*) ;; *) continue ;; esac  # all zeros: a deletion
+  [ "$old" = "$new" ] && continue
+  tips="$tips $new"
+done
+[ -z "$tips" ] && exit 0
+
+bad=0
+for t in $tips; do
+  # Full tree of the new tip, plus every file version in commits we did not have yet.
+  output=$(rg_scan --rev "$t" --range "$t --not --remotes --branches" --quiet 2>&1)
+  status=$?
+  [ -n "$output" ] && printf '%s\n' "$output" >&2
+  [ "$status" -eq 1 ] && bad=1
+done
+[ "$bad" -eq 0 ] && exit 0
+
+{
+  echo "REPOGUARD: BLOCKED. The incoming code has malware, so this update was cancelled."
+  echo "Your files and branches were not changed. Tell whoever pushed it that their machine is infected."
+} >&2
+# git retries a failed fetch ref by ref, so only show one popup per incoming commit.
+stamp="${TMPDIR:-${TEMP:-/tmp}}/repoguard-blocked-$(echo $tips | cksum | cut -d' ' -f1)"
+[ -n "$(find "$stamp" -mmin -1 2>/dev/null)" ] && exit 1
+touch "$stamp" 2>/dev/null
+[ -z "$SCAN_NO_NOTIFY" ] && rg_notify "Pull blocked: malware" "Incoming code from GitHub has malware. Git stopped the update, so your files were not changed." >/dev/null 2>&1 &
+exit 1

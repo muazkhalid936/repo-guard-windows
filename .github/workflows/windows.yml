@@ -1,0 +1,75 @@
+name: Windows build and tests
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    env:
+      QT_QPA_PLATFORM: offscreen
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
+
+      - name: Tests (source)
+        run: python -m pytest -v tests
+
+      - name: Build RepoGuard.exe and repoguard-cli.exe
+        run: |
+          python tools/make_icon.py
+          python -m PyInstaller --noconfirm RepoGuard.spec
+
+      - name: Tests (built program)
+        shell: pwsh
+        run: |
+          $env:REPOGUARD_CLI = "$PWD\dist\RepoGuard\repoguard-cli.exe"
+          python -m pytest -v tests/test_core.py tests/test_protect.py tests/test_pc_agent.py tests/test_github_watch.py
+
+      - name: Screenshots of every page
+        shell: pwsh
+        run: |
+          $env:REPOGUARD_SUPPORT = "$env:RUNNER_TEMP\rg-snap"
+          Start-Process -Wait -FilePath "dist\RepoGuard\RepoGuard.exe" -ArgumentList "--snapshot", "$PWD\snapshots"
+          Get-ChildItem snapshots
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          $version = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}".TrimStart("v") } else { "0.1.0" }
+          if (-not (Get-Command iscc -ErrorAction SilentlyContinue)) { choco install innosetup -y --no-progress }
+          $iscc = (Get-Command iscc -ErrorAction SilentlyContinue).Source
+          if (-not $iscc) { $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" }
+          & $iscc "/DAppVersion=$version" installer\RepoGuard.iss
+          Get-ChildItem installer\Output
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RepoGuard-Setup
+          path: installer/Output/*.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: snapshots/*.png
+
+      - name: Publish release (tags only)
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${{ github.ref_name }}" (Get-ChildItem installer\Output\*.exe).FullName --title "RepoGuard ${{ github.ref_name }}" --generate-notes

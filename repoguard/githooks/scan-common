@@ -1,0 +1,17 @@
+#!/bin/sh
+# RepoGuard: shared by the post-* hooks. Runs after git has already updated the files, as a
+# second line of defence (the reference-transaction hook normally blocks infected code first).
+[ -n "$REPOGUARD_ALLOW_FETCH" ] && exit 0
+. "$(dirname "$0")/repoguard.conf"
+output=$(rg_scan --rev HEAD --quiet 2>&1)
+status=$?
+[ -n "$output" ] && printf '%s\n' "$output" >&2
+if [ "$status" -eq 1 ]; then
+  {
+    echo "Files were updated, but nothing from them has been run."
+    echo "Don't open this folder in VS Code or run npm commands in it."
+    echo "To undo a pull: git reset --hard ORIG_HEAD"
+  } >&2
+  [ -z "$SCAN_NO_NOTIFY" ] && rg_notify "Malware warning" "A git update brought in suspicious code. Check the Git output before opening or running this project." >/dev/null 2>&1 &
+fi
+exit 0
