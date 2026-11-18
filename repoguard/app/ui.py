@@ -93,10 +93,10 @@ def button(text, fn, danger=False, primary=False):
     b = QPushButton(text.replace("&", "&&"))  # a lone & would turn into a keyboard-shortcut underline
     b.clicked.connect(fn)
     b.setCursor(Qt.PointingHandCursor)
-    if danger:
-        b.setStyleSheet(f"background:{DANGER}; color:white; padding:6px 14px; border-radius:6px; font-weight:600")
-    elif primary:
-        b.setStyleSheet("background:#2f6fde; color:white; padding:6px 14px; border-radius:6px; font-weight:600")
+    if danger or primary:
+        bg = DANGER if danger else "#2f6fde"
+        b.setStyleSheet(f"QPushButton {{ background:{bg}; color:white; padding:6px 14px; border-radius:6px; font-weight:600 }}"
+                        "QPushButton:disabled { background:rgba(128,128,128,0.35); color:rgba(255,255,255,0.8) }")
     return b
 
 
@@ -302,7 +302,9 @@ class ThisPC(Page):
                 self.boxes.append((f, box))
                 c.lay.addWidget(box)
             self.body.addWidget(c)
-        if not pc.get("findings"):
+        if not pc.get("time"):
+            self.body.addWidget(label("Not checked yet." + (" Checking now…" if m.pc_running else " Click Scan Now."), color=MUTED))
+        elif not pc.get("findings"):
             self.body.addWidget(label("✓ Nothing suspicious on this PC.", size=15, bold=True, color=SAFE))
         inv = pc.get("inventory", [])
         if inv:
