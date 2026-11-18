@@ -2,7 +2,7 @@
 
 The app and the git hooks call this console program, so the scanners run in their own process.
 """
-import os, runpy, sys
+import os, sys
 
 if __package__ in (None, ""):
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -25,7 +25,11 @@ def main(argv=None):
     if len(argv) >= 2 and argv[0] == "--core" and argv[1] in CORE_SCRIPTS:
         script = os.path.join(paths.CORE, argv[1] + ".py")
         sys.argv = [script] + argv[2:]
-        runpy.run_path(script, run_name="__main__")
+        # Not runpy.run_path: inside the built exe, PyInstaller's import hook claims every path and
+        # run_path then looks for a __main__ module "inside" the .py file.
+        with open(script, "rb") as fh:
+            code = compile(fh.read(), script, "exec")
+        exec(code, {"__name__": "__main__", "__file__": script, "__builtins__": __builtins__})
         return 0
     if len(argv) == 2 and argv[0] == "protect" and argv[1] in ("on", "off", "status"):
         from repoguard import protect
