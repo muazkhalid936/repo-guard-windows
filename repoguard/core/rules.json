@@ -55,14 +55,14 @@
    "severity": "block",
    "scope": "any",
    "label": "Known malware code",
-   "pattern": "cNyiIhxmKlTvaNSt|rCLdggd\\$ZUlOU|FHptxEVPmEWNHCYlL|hLsNetSECrqLyGkrjdgtIJ|iHnmzEbnHW|Fy_hvvQdtanMSNmFvVBQC|mlCqUCKEc|global\\.i\\s*=\\s*'A11|var z = '-6752|rmcej%otb%|Cot%3t=shtP"
+   "pattern": "cNyiIhxm[K]lTvaNSt|rCLdg[g]d\\$ZUlOU|FHptxE[V]PmEWNHCYlL|hLsNetS[E]CrqLyGkrjdgtIJ|iHnmz[E]bnHW|Fy_hvvQ[d]tanMSNmFvVBQC|mlCq[U]CKEc|global\\.i\\s*=\\s*'A11|var z = '-67[5]2|rmcej[%]otb%|Cot[%]3t=shtP"
   },
   {
    "id": "known_host",
    "severity": "block",
    "scope": "any",
    "label": "Known malware server address",
-   "pattern": "jsonkeeper\\.com|npoint\\.io|ipcheck-six"
+   "pattern": "jsonkeeper\\.com|npoint\\.io|ipcheck[-]six"
   },
   {
    "id": "autorun",
@@ -133,7 +133,7 @@
    "severity": "block",
    "scope": "any",
    "label": "Loads code from an Ethereum transaction",
-   "pattern": "ethplorer\\.io|eth_getTransactionByHash|0x3b1574417524c11a7403c4b232CAcBb320CceBC6"
+   "pattern": "ethplorer\\.io|eth_getTransa[c]tionByHash|0x3b1574417524c11a7403c4b232CAcBb320Cce[B]C6"
   }
  ],
  "fake_media": {

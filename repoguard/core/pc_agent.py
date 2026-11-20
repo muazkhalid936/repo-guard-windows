@@ -68,7 +68,7 @@ BAD_CMD = re.compile(
     r"|\bnode(?:\.exe)?\"?\s+\S*(?:[\\/]|\b)init\b"
     r"|\.orc\b|fa-brand-400|fa-solid-400\.woff2"
     r"|xmrig|kdevtmpfsi|kinsing|minerd|cpuminer|stratum\+tcp|nicehash|cryptonight"
-    r"|ethplorer|eth_getTransactionByHash|jsonkeeper\.com|npoint\.io", re.I)
+    r"|ethplore[r]|eth_getTransa[c]tionByHash|jsonkeeper\.com|npoint\.io", re.I)
 ODD_CMD = re.compile(
     r"-w(?:indowstyle)?\s+hidden.*(?:http|\\temp\\|\\public\\)"
     r"|rundll32(?:\.exe)?\"?\s+[^\n]*javascript:"

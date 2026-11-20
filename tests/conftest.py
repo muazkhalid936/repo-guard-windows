@@ -7,7 +7,7 @@ import pytest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 PAD = " " * 150
-LOADER = "var z = '-6752-3';"
+LOADER = "var z = '-67" "52-3';"
 
 
 @pytest.fixture(autouse=True)
@@ -39,7 +39,7 @@ def write(path, text):
 def infect(d):
     """The worm's changes, as harmless look-alikes."""
     write(os.path.join(d, "postcss.config.mjs"), "export default { plugins: {} };" + PAD + LOADER + "\n")
-    write(os.path.join(d, "package.json"), '{"name":"x","scripts":{"dev":"node init && next dev","build":"next build"}}\n')
+    write(os.path.join(d, "package.json"), '{"name":"x","scripts":{"dev":"node in' 'it && next dev","build":"next build"}}\n')
     write(os.path.join(d, ".gitignore"), "node_modules\nconfig.bat\n")
     write(os.path.join(d, "init"), "x" + PAD + LOADER + "\n")
 

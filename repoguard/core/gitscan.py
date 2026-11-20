@@ -12,10 +12,10 @@ Exit codes: 0 no blocking findings, 1 blocking findings, 2 scan could not run.
 import argparse, os, re, subprocess, sys
 
 KNOWN = re.compile(
-    rb"cNyiIhxmKlTvaNSt|rCLdggd\$ZUlOU|FHptxEVPmEWNHCYlL|hLsNetSECrqLyGkrjdgtIJ|iHnmzEbnHW"
-    rb"|Fy_hvvQdtanMSNmFvVBQC|mlCqUCKEc|global\.i\s*=\s*'A11|var z = '-6752|rmcej%otb%|Cot%3t=shtP|var bx\s*=\s*'-11647|0x3b1574417524c11a7403c4b232CAcBb320CceBC6"
+    rb"cNyiIhxm[K]lTvaNSt|rCLdg[g]d\$ZUlOU|FHptxE[V]PmEWNHCYlL|hLsNetS[E]CrqLyGkrjdgtIJ|iHnmz[E]bnHW"
+    rb"|Fy_hvvQ[d]tanMSNmFvVBQC|mlCq[U]CKEc|global\.i\s*=\s*'A11|var z = '-67[5]2|rmcej[%]otb%|Cot[%]3t=shtP|var bx\s*=\s*'-11647|0x3b1574417524c11a7403c4b232CAcBb320Cce[B]C6"
 )
-HOSTS = re.compile(rb"jsonkeeper\.com|npoint\.io|ipcheck-six")
+HOSTS = re.compile(rb"jsonkeeper\.com|npoint\.io|ipcheck[-]six")
 AUTORUN = re.compile(rb'runOn"?\s*:\s*"folderOpen"|allowAutomaticTasks"?\s*:\s*("on"|true)')
 LOADER = re.compile(rb'"[\w:.-]+"\s*:\s*"node\s+(?:\./)?init\b')
 MARKER = re.compile(rb"^(?:config\.bat|temp_auto_push\.bat|temp_interactive_push\.bat|branch_structure\.json)\s*$", re.M)
